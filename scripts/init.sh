@@ -114,7 +114,7 @@ p "准备 ${build_os^^}"
 sudo mkdir ${workdir_host} && sudo chown -R runner:runner ${workdir_host}
 
 if [ "${build_os}" == 'ubuntu' ]; then
-    docker_image='ubuntu-24.04'
+    docker_image='ubuntu:24.04'
 elif [ "${build_os}" == 'cachyos' ]; then
     docker_image='cachyos/cachyos-v3'
 fi
@@ -148,9 +148,9 @@ dr '. set_env ffdir "${ffdir}"'
 p "安装依赖"
 if [ "${build_os}" == 'ubuntu' ]; then
     dr apt-get -y -qq update
-    # 关键修复：显式安装 sudo（放在最前面）
+    # 关键修复：显式安装 sudo 和 tzdata（放在最前面）
     dr DEBIAN_FRONTEND=noninteractive \
-        apt-get -y -qq install sudo ack antlr3 asciidoc autoconf automake autopoint binutils \
+        apt-get -y -qq install sudo tzdata ca-certificates ack antlr3 asciidoc autoconf automake autopoint binutils \
         bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler \
         ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged \
         help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev \
@@ -176,7 +176,7 @@ elif [ "${build_os}" == 'cachyos' ]; then
         python-docutils python-pyelftools qemu-img re2c rsync scons squashfs-tools \
         subversion swig texinfo uglify-js upx unzip wget xmlto xxd zstd 7zip \
         paru sudo shadow jq ninja python-setuptools python-pyelftools bc libxslt openssl time \
-        util-linux which perl-extutils-makemaker fuse2 less tree
+        util-linux which perl-extutils-makemaker fuse2 less tree tzdata ca-certificates
         # 不要添加zlib，会冲突
 
     p "确保用户一致并配置 sudo"
