@@ -24,7 +24,7 @@ build_date=$(date +%Y.%m.%d)
 p "克隆 istoreos 到 ${workdir}/openwrt"
 . set_env "wrtdir" "${workdir}/openwrt"
 umask 0022
-clone istoreos-22.03 ${istoreos_repo} ${wrtdir}
+clone istoreos-24.10 ${istoreos_repo} ${wrtdir}
 pushd ${wrtdir}
 git config core.filemode false # 忽略权限变更
 popd
@@ -32,8 +32,8 @@ popd
 
 p "下载其它仓库"
 . set_env "otherdir" "${workdir}/other"
-clone openwrt-21.02 ${immortalwrt_luci_repo} ${otherdir}/imm_luci_21 &
-clone openwrt-21.02 ${immortalwrt_pkg_repo} ${otherdir}/imm_pkg_21 &
+clone openwrt-24.10 ${immortalwrt_luci_repo} ${otherdir}/imm_luci_21 &
+clone openwrt-24.10 ${immortalwrt_pkg_repo} ${otherdir}/imm_pkg_21 &
 clone master ${immortalwrt_luci_repo} ${otherdir}/imm_luci_ma &
 clone master ${immortalwrt_pkg_repo} ${otherdir}/imm_pkg_ma &
 clone master ${lede_luci_repo} ${otherdir}/lede_luci_ma &
@@ -41,7 +41,7 @@ clone master ${dockerman_repo} ${otherdir}/dockerman &
 clone main ${sbwml_pkgs_repo} ${otherdir}/sbwml_pkgs &
 clone master ${openwrt_add_repo} ${otherdir}/openwrt-add &
 clone master ${v2ray_geodata_repo} ${otherdir}/v2ray_geodata &
-clone openwrt-22.03 ${autocore_arm_repo} ${otherdir}/autocore &
+clone openwrt-24.10 ${autocore_arm_repo} ${otherdir}/autocore &
 wait && sync
 
 p "一些调整"
@@ -166,7 +166,7 @@ EOF
 
 p "预编译 node"
 rm -rf ./feeds/packages/lang/node
-clone packages-22.03 https://github.com/sbwml/feeds_packages_lang_node-prebuilt ./feeds/packages/lang/node
+clone packages-24.10 https://github.com/sbwml/feeds_packages_lang_node-prebuilt ./feeds/packages/lang/node
 p "更换 golang 版本"
 rm -rf ./feeds/packages/lang/golang
 clone 26.x https://github.com/sbwml/packages_lang_golang ./feeds/packages/lang/golang
@@ -262,7 +262,7 @@ mkdir -p ./files/etc/{uci-defaults,openclash/core}
 cp -f ${ffdir}/scripts/istoreos/zzz-default-settings ./files/etc/uci-defaults/
 wget -qO- https://github.com/vernesong/OpenClash/raw/core/master/meta/clash-linux-arm64.tar.gz | tar xOvz > ./files/etc/openclash/core/clash_meta
 chmod +x ./files/etc/openclash/core/clash*
-echo -e "\n\033[34miStoreOS\033[0m 22.03.7 | ${build_date//./-}\n" > ./files/etc/banner
+echo -e "\n\033[34miStoreOS\033[0m 24.10.5 | ${build_date//./-}\n" > ./files/etc/banner
 
 
 p "清理临时文件"
