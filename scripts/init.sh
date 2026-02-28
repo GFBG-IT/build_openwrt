@@ -148,8 +148,9 @@ dr '. set_env ffdir "${ffdir}"'
 p "安装依赖"
 if [ "${build_os}" == 'ubuntu' ]; then
     dr apt-get -y -qq update
+    # 关键修复：显式安装 sudo（放在最前面）
     dr DEBIAN_FRONTEND=noninteractive \
-        apt-get -y -qq install ack antlr3 asciidoc autoconf automake autopoint binutils \
+        apt-get -y -qq install sudo ack antlr3 asciidoc autoconf automake autopoint binutils \
         bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler \
         ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged \
         help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev \
@@ -157,7 +158,7 @@ if [ "${build_os}" == 'ubuntu' ]; then
         libtool libyaml-dev libz-dev lld llvm llvm-dev lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full \
         patch pkgconf python3 python3-pip python3-ply python3-docutils python3-pyelftools qemu-utils \
         re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget \
-        xmlto xxd zlib1g-dev zstd sudo python3-pysocks python3-unidecode python-setuptools
+        xmlto xxd zlib1g-dev zstd python3-pysocks python3-unidecode python-setuptools
 
     p "确保用户一致并配置 sudo"
     dr "mkdir -p /etc/sudoers.d;"
