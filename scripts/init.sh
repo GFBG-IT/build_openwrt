@@ -114,7 +114,7 @@ p "准备 ${build_os^^}"
 sudo mkdir ${workdir_host} && sudo chown -R runner:runner ${workdir_host}
 
 if [ "${build_os}" == 'ubuntu' ]; then
-    docker_image='ubuntu:24.04'
+    docker_image='ubuntu-24.04'
 elif [ "${build_os}" == 'cachyos' ]; then
     docker_image='cachyos/cachyos-v3'
 fi
