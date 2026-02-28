@@ -47,70 +47,70 @@ jobs:
     - name: 准备容器 ( init.sh )
       run: bash scripts/init.sh
 
-    - name: 准备源码 ( prepare.sh )
-      run: d "cd ${ffdir} && bash scripts/istoreos/prepare.sh"
+    - name: 准備源碼 ( prepare.sh )
+      run: d 'cd "$ffdir" && bash scripts/istoreos/prepare.sh'
 
-    - name: 准备编译
+    - name: 准備編譯
       run: |
         d '
-          p "处理菜单"
-          cd ${wrtdir}/feeds/luci && bash ${ffdir}/scripts/menu.sh
-          cd ${wrtdir}/package/add && bash ${ffdir}/scripts/menu.sh
+          p "處理菜單"
+          cd "$wrtdir/feeds/luci" && bash "$ffdir/scripts/menu.sh"
+          cd "$wrtdir/package/add" && bash "$ffdir/scripts/menu.sh"
 
-          p "展开配置"
-          cd ${wrtdir}
-          cp ${ffdir}/scripts/istoreos/config.seed .config
+          p "展開配置"
+          cd "$wrtdir"
+          cp "$ffdir/scripts/istoreos/config.seed" .config
           make defconfig
         '
 
-    - name: 压缩编译目录
+    - name: 壓縮編譯目錄
       run: |
         d '
-          cd ${workdir}
-          cp -r ${ffdir} ${wrtdir}/
-          tar -cf - $(basename ${wrtdir})/ | zstd -19 -T0 > wrt_end.tar.zst
-          rm -rf ${wrtdir}/$(basename ${ffdir})
+          cd "$workdir"
+          cp -r "$ffdir" "$wrtdir/"
+          tar -cf - "$(basename "$wrtdir")/" | zstd -19 -T0 > wrt_end.tar.zst
+          rm -rf "$wrtdir/$(basename "$ffdir")"
         '
 
-    - name: 上传编译目录
+    - name: 上傳編譯目錄
       uses: actions/upload-artifact@main
       with:
         name: wrt_end
         path: ${{ env.workdir_host }}/wrt_end.tar.zst
         compression-level: 0
 
-    - name: 缓存
+    - name: 緩存
       uses: HiGarfield/cachewrtbuild@main
       with:
         mixkey: istoreos
         prefix: ${{ env.workdir_host }}/openwrt
 
-    - name: 开始编译 iStoreOS
+    - name: 開始編譯 iStoreOS
       run: |
         d '
-          cd ${wrtdir}
-          p "开始下载"
+          cd "$wrtdir"
+          p "開始下載"
           make download -j$(($(nproc) + 1))
-          p "开始编译"
+          p "開始編譯"
           make -j$(($(nproc) + 1))
           if [ $? -ne 0 ]; then
-            p "！！编译失败！！开启单线程"
+            p "！！編譯失敗！！開啟單線程"
             make -j1 V=s
           else
-            p "编译成功"
+            p "編譯成功"
             . set_env build_success "true"
           fi
 
-          p "打包日志"
-          tar -cf - logs/ | zstd -19 -T0 > "${workdir}/logs_istoreos.tar.zst"
+          p "打包日誌"
+          tar -cf - logs/ | zstd -19 -T0 > "$workdir/logs_istoreos.tar.zst"
 
-          [ "${build_success}" == "true" ] || exit 1
+          [ "$build_success" = "true" ] || exit 1
         '
 
-        p "打印剩余空间"
+        p "打印剩餘空間"
         df -h
 
-    - name: 上传日志文件
+    - name: 上傳日誌文件
       uses: actions/upload-artifact@main
       with:
         name: logs
@@ -118,7 +118,7 @@ jobs:
         compression-level: 0
 
     - if: env.build_success == 'true'
-      name: 上传固件 ( sfs )
+      name: 上傳固件 ( sfs )
       uses: actions/upload-artifact@main
       with:
         name: firmware
@@ -126,7 +126,7 @@ jobs:
         compression-level: 0
 
     - if: env.build_success == 'true'
-      name: 上传 packages
+      name: 上傳 packages
       uses: actions/upload-artifact@main
       with:
         name: packages
@@ -136,7 +136,7 @@ jobs:
     - if: github.event_name == 'repository_dispatch' && env.build_success == 'true'
       name: 整理文件
       run: |
-        p "将原始固件移动到工作目录"
+        p "將原始固件移動到工作目錄"
         cd ${{ env.workdir_host }}
         rm -rf ./artifact/
         mkdir -p ./artifact/
@@ -145,16 +145,16 @@ jobs:
 
         d '
           p "重新打包固件"
-          cd ${workdir}/artifact/
-          7z a -tzip N1-iStoreOS-24.10.5-${build_date}-sfs.zip *n1*squashfs*
-          7z a -r -tzip N1-iStoreOS-24.10.5-${build_date}-packages.zip packages/
+          cd "$workdir/artifact/"
+          7z a -tzip "N1-iStoreOS-24.10.5-${build_date}-sfs.zip" *n1*squashfs*
+          7z a -r -tzip "N1-iStoreOS-24.10.5-${build_date}-packages.zip" packages/
         '
 
-        p "打印剩余空间"
+        p "打印剩餘空間"
         df -h
 
     - if: github.event_name == 'repository_dispatch' && env.build_success == 'true'
-      name: 发布 release
+      name: 發布 release
       uses: ncipollo/release-action@main
       env:
         GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
